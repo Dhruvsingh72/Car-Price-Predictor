@@ -80,8 +80,8 @@ with open("car_price_rf_pipeline.pkl", "rb") as f:
 
 # App Title
 
-st.markdown("<h1 style='text-align:top center; color:white;'>🚗 Car Price Predictor</h1>", unsafe_allow_html=True)
-st.markdown("<h3><p style='text-align:center; color:white;'>Enter your car details and get an instant price estimate</p></h3>", unsafe_allow_html=True)
+st.markdown("<h2 style='text-align:top center; color:white;'>🚗 Car Price Predictor</h2>", unsafe_allow_html=True)
+st.markdown("<h4><p style='text-align:center; color:white;'>Enter your car details and get an instant price estimate</p></h4>", unsafe_allow_html=True)
 
 with st.container():
     
