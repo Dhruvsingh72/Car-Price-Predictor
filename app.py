@@ -7,8 +7,10 @@ from datetime import datetime
 st.set_page_config(
     page_title="Car Price Predictor",
     page_icon="🚗",
-    layout="centered"
+    layout="centered",
+    initial_sidebar_state="auto"
 )
+
 st.markdown("""
     <style>
     /* Full-page animated gradient background */
@@ -80,8 +82,8 @@ with open("car_price_rf_pipeline.pkl", "rb") as f:
 
 # App Title
 
-st.markdown("<h2 style='text-align:top center; color:white;'>🚗 Car Price Predictor</h2>", unsafe_allow_html=True)
-st.markdown("<h4><p style='text-align:center; color:white;'>Enter your car details and get an instant price estimate</p></h4>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align:top center; color:white;'>🚗 Car Price Predictor</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center; color:white;'>Enter your car details and get an instant price estimate</p>", unsafe_allow_html=True)
 
 with st.container():
     
