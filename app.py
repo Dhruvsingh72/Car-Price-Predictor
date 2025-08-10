@@ -3,18 +3,15 @@ import pickle
 import pandas as pd
 from datetime import datetime
 
-# ==============================
+
 # Page Config
-# ==============================
+
 st.set_page_config(
     page_title="Car Price Predictor",
     page_icon="🚗",
     layout="centered"
 )
 
-# ==============================
-# Animated Gradient + Glassmorphism Style
-# ==============================
 st.markdown("""
     <style>
     /* Full-page animated gradient background */
@@ -80,21 +77,17 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ==============================
+
 # Load Model
-# ==============================
+
 with open("car_price_rf_pipeline.pkl", "rb") as f:
     model = pickle.load(f)
 
-# ==============================
 # App Title
-# ==============================
+
 st.markdown("<h1 style='text-align:center; color:white;'>🚗 Car Price Predictor</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align:center; color:white;'>Enter your car details and get an instant price estimate</p>", unsafe_allow_html=True)
 
-# ==============================
-# Glassmorphism Form Container
-# ==============================
 with st.container():
     
 
