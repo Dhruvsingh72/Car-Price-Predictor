@@ -3,15 +3,12 @@ import pickle
 import pandas as pd
 from datetime import datetime
 
-
 # Page Config
-
 st.set_page_config(
     page_title="Car Price Predictor",
     page_icon="🚗",
     layout="centered"
 )
-
 st.markdown("""
     <style>
     /* Full-page animated gradient background */
@@ -26,7 +23,6 @@ st.markdown("""
         animation: gradientBG 15s ease infinite;
         font-family: 'Poppins', sans-serif;
     }
-
     /* Glassmorphism card */
     .glass-card {
         background: rgba(255, 255, 255, 0.25);
@@ -76,7 +72,6 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
-
 
 # Load Model
 
