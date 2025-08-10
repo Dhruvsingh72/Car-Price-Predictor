@@ -1,0 +1,62 @@
+# Ignore OS files
+venv/
+
+
+.DS_Store
+Thumbs.db
+
+# Ignore log files and databases
+*.log
+*.sqlite
+*.db
+
+# Ignore build and output folders
+/build/
+/dist/
+/out/
+/target/
+
+# Ignore IDE and editor files
+.vscode/
+.idea/
+*.iml
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Ignore environment files (if any)
+.env
+.env.local
+.env.*.local
+
+# Ignore node modules (if it’s a JS/Node project)
+node_modules/
+
+# Ignore Python cache files (if Python involved)
+__pycache__/
+*.py[cod]
+
+# Ignore compiled files
+*.class
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Ignore package lock files if you want (optional)
+package-lock.json
+yarn.lock
+
+# Ignore coverage reports
+coverage/
+*.lcov
+
+# Ignore temporary files
+*.tmp
+*.temp
+
+# Ignore car project specific files (customize if you want)
+logs/
+temp/
+reports/
