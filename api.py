@@ -90,3 +90,7 @@ def get_feature_importances():
     except Exception as e:
         return {"error": str(e)}
     return {"error": "Model does not support feature importances"}
+
+@app.get("/logs")
+def get_prediction_logs():
+    return database.get_logs()

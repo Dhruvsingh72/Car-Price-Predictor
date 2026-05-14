@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime
 import plotly.express as px
 import requests
-import database
+# import database (Removed: Only API talks to DB now)
 from fpdf import FPDF
 
 # Page Config 
@@ -810,8 +810,14 @@ elif page == "🛡️ Admin Portal":
         st.markdown("<p style='text-align:center; color:#38bdf8;'>Live telemetry of user searches from SQLite Database</p>", unsafe_allow_html=True)
         st.markdown("<div class='card'>", unsafe_allow_html=True)
         
-        # Fetch logs from DB
-        logs = database.get_logs()
+        # Fetch logs from Backend API
+        try:
+            response = requests.get(f"{API_URL}/logs")
+            response.raise_for_status()
+            logs = response.json()
+        except Exception as e:
+            st.error(f"Backend API Error: Unable to fetch telemetry. Details: {e}")
+            logs = []
     
         if len(logs) == 0:
             st.info("No predictions logged yet. Try making some predictions in the 'Predict Price' tab!")
