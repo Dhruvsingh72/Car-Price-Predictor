@@ -4,7 +4,7 @@ from datetime import datetime
 import plotly.express as px
 import requests
 # import database (Removed: Only API talks to DB now)
-from fpdf import FPDF
+# from fpdf import FPDF (Removed as requested)
 
 # Page Config 
 st.set_page_config(
@@ -335,23 +335,20 @@ elif page == "⚡ Price Prediction":
             st.error(f"Backend API Error: Make sure api.py is running! Details: {e}")
             prediction = 0
 
-        # Category
-        if prediction < 300000:
-            category = "Budget Car"
-        elif prediction < 800000:
-            category = "Mid-range Car"
-        else:
+        # Define Category based on Price
+        if prediction > 1000000:
             category = "Premium Car"
+            segment_info = "Luxury Segment Vehicle"
+        elif prediction > 500000:
+            category = "Mid-range Car"
+            segment_info = "Mid-range Segment Vehicle"
+        else:
+            category = "Budget Car"
+            segment_info = "Budget Segment Vehicle"
 
         st.markdown(f"<div class='result-box'>₹ {prediction:,.0f}</div>", unsafe_allow_html=True)
-        st.write("Category:", category)
-
-        if prediction > 1000000:
-            st.info("Luxury Segment Vehicle")
-        elif prediction > 500000:
-            st.info("Mid-range Segment Vehicle")
-        else:
-            st.info("Budget Segment Vehicle")
+        st.write(f"**Category:** {category}")
+        st.info(segment_info)
 
         if km_driven > 200000:
             st.warning("High kilometers driven may reduce accuracy")
@@ -379,6 +376,7 @@ elif page == "⚡ Price Prediction":
                     st.info("Your estimated value matches the historical average exactly.")
                 
                 # Factor 1: Age / Year
+                
                 avg_year = similar_cars['year'].mean()
                 if year > avg_year:
                     st.write(f"- 📈 **Age:** Your car is from **{year}**, which is newer than the average (around **{int(avg_year)}**). Newer cars retain more value.")
@@ -402,56 +400,11 @@ elif page == "⚡ Price Prediction":
                 
                 st.caption("Note: These insights compare your specific inputs against the historical dataset used to train the AI.")
 
-        # --- PDF CERTIFICATE GENERATION ---
-        st.markdown("---")
-        st.subheader("Official Documents")
-        
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_font("Arial", 'B', size=24)
-        pdf.cell(0, 20, txt="Vehicle Valuation Certificate", ln=True, align='C')
-        
-        pdf.set_font("Arial", size=12)
-        pdf.cell(0, 10, txt=f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M')}", ln=True, align='R')
-        pdf.ln(10)
-        
-        pdf.set_font("Arial", 'B', size=16)
-        pdf.cell(0, 10, txt="Vehicle Specifications", ln=True)
-        pdf.set_font("Arial", size=12)
-        pdf.cell(0, 8, txt=f"Brand: {brand}", ln=True)
-        pdf.cell(0, 8, txt=f"Model: {model_name}", ln=True)
-        pdf.cell(0, 8, txt=f"Year of Manufacture: {year}", ln=True)
-        pdf.cell(0, 8, txt=f"Kilometers Driven: {km_driven:,.0f} km", ln=True)
-        pdf.cell(0, 8, txt=f"Fuel Type: {fuel}", ln=True)
-        pdf.cell(0, 8, txt=f"Transmission: {transmission}", ln=True)
-        pdf.cell(0, 8, txt=f"Ownership: {owner}", ln=True)
-        pdf.ln(10)
-        
-        pdf.set_font("Arial", 'B', size=18)
-        pdf.set_text_color(0, 102, 204)
-        pdf.cell(0, 15, txt=f"Estimated Market Value: INR {prediction:,.0f}", ln=True, align='C')
-        
-        pdf.set_text_color(0, 0, 0)
-        pdf.set_font("Arial", 'I', size=10)
-        pdf.ln(20)
-        pdf.cell(0, 10, txt="This is an AI-generated estimate based on historical market data.", ln=True, align='C')
-        pdf.cell(0, 10, txt="Powered by Car Valuation Engine", ln=True, align='C')
-        
-        pdf_bytes = pdf.output(dest="S")
-        if isinstance(pdf_bytes, str):
-            pdf_bytes = pdf_bytes.encode('latin-1')
-        else:
-            pdf_bytes = bytes(pdf_bytes)
-
-        st.download_button(
-            label="📄 Download Official Valuation Certificate (PDF)",
-            data=pdf_bytes,
-            file_name=f"{brand}_{model_name}_Valuation.pdf",
-            mime="application/pdf",
-            use_container_width=True
-        )
+        # PDF Generation Section Removed
 
     st.markdown("</div>", unsafe_allow_html=True)
+
+    
 # ---------- FIND MY CAR ----------
 elif page == "🔍 Find My Car":
     st.markdown("<h1 style='text-align:center;'>🔍 Find My Car</h1>", unsafe_allow_html=True)
@@ -573,135 +526,8 @@ elif page == "📊 Market Analytics":
     fig6 = px.bar(brand_count, x="brand", y="count", template=plotly_template, title="Most Popular Brands", color="count", color_continuous_scale="Blues")
     st.plotly_chart(fig6, use_container_width=True)
 
-    # --- MARKET INSIGHTS MERGED HERE ---
-    st.markdown("---")
-    st.markdown("### Real Insights from the Market")
-    
-    # Dynamic calculations for Insights
-    avg_petrol = df[df["fuel"] == "Petrol"]["selling_price"].mean()
-    avg_diesel = df[df["fuel"] == "Diesel"]["selling_price"].mean()
-    
-    if pd.isna(avg_petrol) or pd.isna(avg_diesel) or min(avg_petrol, avg_diesel) == 0:
-        fuel_diff = 0
-        pricier_fuel = "Unknown"
-    else:
-        fuel_diff = abs(avg_diesel - avg_petrol) / min(avg_petrol, avg_diesel) * 100
-        pricier_fuel = "Diesel" if avg_diesel > avg_petrol else "Petrol"
-    
-    avg_manual = df[df["transmission"] == "Manual"]["selling_price"].mean()
-    avg_auto = df[df["transmission"] == "Automatic"]["selling_price"].mean()
-    if pd.isna(avg_manual) or pd.isna(avg_auto) or avg_manual == 0:
-        trans_diff = 0
-    else:
-        trans_diff = abs(avg_auto - avg_manual) / avg_manual * 100
-    
-    # FIX: Use actual max year in dataset instead of datetime.now() because the dataset is older
-    max_year = df["year"].max()
-    recent_cars = df[df["year"] >= max_year - 2]["selling_price"].mean()
-    old_cars = df[df["year"] <= max_year - 10]["selling_price"].mean()
-    
-    recent_cars = 0 if pd.isna(recent_cars) else recent_cars
 
-    # ==========================================
-    # 🤖 SECTION 5: AI MODEL INSIGHTS (Feature Importances)
-    # ==========================================
-    st.markdown("---")
-    st.subheader("🤖 AI Decision Intelligence")
-    st.markdown("<p style='color:#94a3b8;'>Understanding how the AI Model weights different car features to estimate price.</p>", unsafe_allow_html=True)
-    
-    try:
-        fi_response = requests.get(f"{API_URL}/feature_importances")
-        if fi_response.status_code == 200:
-            fi_data = fi_response.json()
-            if "features" in fi_data:
-                # Prepare data for plotting
-                fi_df = pd.DataFrame({
-                    "Feature": fi_data["features"],
-                    "Importance": fi_data["importances"]
-                }).sort_values("Importance", ascending=False).head(10) # Top 10 factors
-                
-                # Plot
-                fig_fi = px.bar(
-                    fi_df, 
-                    x="Importance", 
-                    y="Feature", 
-                    orientation='h',
-                    template=plotly_template,
-                    title="Top 10 Price Determinants (AI Insights)",
-                    color="Importance",
-                    color_continuous_scale="Viridis"
-                )
-                fig_fi.update_layout(yaxis={'categoryorder':'total ascending'})
-                st.plotly_chart(fig_fi, use_container_width=True)
-                st.caption("Insight: This chart shows which features (Age, Kilometers, Brand, etc.) most influenced the AI's valuation logic.")
-            else:
-                st.info("Feature importance data is currently being calibrated.")
-        else:
-            st.info("AI Model telemetry is only available when the Backend API is active.")
-    except:
-        st.info("Connect to the live CarVal Engine to see AI decision transparency.")
-    old_cars = 0 if pd.isna(old_cars) else old_cars
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        if pricier_fuel != "Unknown":
-            st.info(f"**Fuel Value:** {pricier_fuel} cars are generally **{fuel_diff:.0f}%** more expensive on average than their counterparts.")
-        else:
-            st.info("**Fuel Value:** Not enough data to compare fuel types.")
-            
-        if trans_diff > 0:
-            st.info(f"**Transmission Premium:** Automatic cars command a **{trans_diff:.0f}%** premium over manual cars in the used market.")
-        else:
-            st.info("**Transmission Premium:** Not enough data to compare transmissions.")
-            
-    with col2:
-        if old_cars > 0 and recent_cars > 0:
-            st.warning(f"**Depreciation:** Cars older than 10 years cost on average **₹{old_cars:,.0f}**, compared to **₹{recent_cars:,.0f}** for cars under 2 years old.")
-        else:
-            st.warning("**Depreciation:** Need more year spread data for depreciation insights.")
-            
-        st.success(f"**Kilometers Driven:** For every additional 10,000 km driven, prices generally drop significantly across all segments.")
 
-    # Feature Importance fetched from API
-    try:
-        res = requests.get(f"{API_URL}/feature_importances")
-        data = res.json()
-        if "features" in data and "importances" in data:
-            st.markdown("### AI Feature Importance")
-            st.write("What factors does our AI consider most important when predicting price?")
-            
-            # ==========================================
-            # 🧠 EXPLAINABLE AI (XAI)
-            # The AI model treats "Fuel_Petrol" and "Fuel_Diesel" as separate math variables.
-            # This loop cleverly groups them back together so the chart shows the overall
-            # importance of "Fuel" to human users.
-            # ==========================================
-            feature_dict = {}
-            for i, f in enumerate(data["features"]):
-                # Remove ugly technical prefixes added by the Machine Learning pipeline
-                clean_f = f.replace('cat__', '').replace('num__', '')
-                base_f = clean_f.split('_')[0].title()
-                
-                # Rename to human-readable labels
-                if base_f == "Km": base_f = "Kilometers Driven"
-                if base_f == "Car": base_f = "Car Age"
-                if base_f == "Seller": base_f = "Seller Type"
-                
-                # Add up the importance scores for the group
-                if base_f not in feature_dict:
-                    feature_dict[base_f] = 0
-                feature_dict[base_f] += data["importances"][i]
-                
-            imp_df = pd.DataFrame({
-                "Feature": list(feature_dict.keys()), 
-                "Importance": list(feature_dict.values())
-            }).sort_values("Importance", ascending=False).head(5)
-            
-            fig = px.bar(imp_df, x="Importance", y="Feature", orientation='h', template="plotly_dark")
-            fig.update_layout(yaxis={'categoryorder':'total ascending'})
-            st.plotly_chart(fig, use_container_width=True)
-    except Exception as e:
-        pass
 
     st.markdown("</div>", unsafe_allow_html=True)
 
